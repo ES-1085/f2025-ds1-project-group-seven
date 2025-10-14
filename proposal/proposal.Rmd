@@ -21,9 +21,14 @@ Text goes here. Refer to the Markdown Quick Reference: Help -> Markdown Quick Re
 Text goes here. Place your data in the /data folder, and add dimensions and codebook to the README in that folder. Then print out the output of glimpse() or skim() of your data frame.
 
 ```{r}
-# Code goes here
-# Read in your data file
+setwd("/cloud/project")
+
+energy <- read_csv("data/energy.csv")
+filtered <- energy %>%
+  filter(Year == 2019)
+
 # Print the output of glimpse() or skim()
+glimpse(filtered)
 ```
 
 ## 3. Data analysis plan
