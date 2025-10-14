@@ -12,9 +12,12 @@ library(broom)
 
 ## 1. Introduction
 
-The introduction should introduce your general research question(s) and your data (where it came from, how it was collected, what are the cases, what are the variables, etc.).
+Our data comes from a dataset showcasing various variables regarding energy for each US state from 1960-2019 from the U.S. Energy Information Administration. Our data is specifically the 2019 data for each state from that dataset. The variables for energy cover the consumption, expenditure, and price of a variety of different energy sources and industries for each state. 
 
-Text goes here. Refer to the Markdown Quick Reference: Help -> Markdown Quick Reference. 
+Research Question: 
+What are the overall trends that are shown in US energy consumption, expenditure, and price?
+Per capita consumption, regional price, regional consumption, etc.
+
 
 ## 2. Data
 
