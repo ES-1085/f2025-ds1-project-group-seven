@@ -7,6 +7,7 @@ output: github_document
 ```{r load-packages, message = FALSE}
 library(tidyverse)
 library(broom)
+library(readxl)
 ## Add any additional packages you are using here
 ```
 
@@ -27,11 +28,38 @@ Text goes here. Place your data in the /data folder, and add dimensions and code
 setwd("/cloud/project")
 
 energy <- read_csv("data/energy.csv")
-filtered <- energy %>%
-  filter(Year == 2019)
+filtered_energy <- energy %>%
+  filter(Year == 2019) %>%
+  select(State, Year, starts_with(c("Consumption", "Expenditure", "Price")))
+
+population <- read_excel("data/Population.xlsx")
+filtered_population <- population[c(-(1:8),-(60:66)),] %>%
+  rename(Population = "...13",
+         State = "table with row headers in column A and column headers in rows 3 through 4. (leading dots indicate sub-parts)") %>%
+  mutate(State = substr(State, 2, nchar(State))) %>%
+  select(State, Population)
+
+joined <- filtered_energy %>%
+  left_join(filtered_population, by = c("State" = "State"))
+
+variables <- colnames(joined)
+variables <- variables[-c(1:2,84)]
+
+per_cap <- joined %>%
+  mutate(across(variables, ~ .x / joined$Population))
+
+for (var in variables) {
+  per_cap[[paste0(var, "_pc")]] <- per_cap[[var]]
+}
+
+per_cap <- per_cap %>%
+  select(State, Year, ends_with("pc"))
+
+final <- joined %>%
+  left_join(per_cap, by = c("State" = "State"))
 
 # Print the output of glimpse() or skim()
-glimpse(filtered)
+glimpse(final)
 ```
 
 ## 3. Data analysis plan
