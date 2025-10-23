@@ -25,7 +25,7 @@ Research Question:
 
 Text goes here. Place your data in the /data folder, and add dimensions and codebook to the README in that folder. Then print out the output of glimpse() or skim() of your data frame.
 
-```{r per_capita}
+```{r datawork}
 setwd("/cloud/project")
 
 energy <- read_csv("data/energy.csv")
@@ -78,8 +78,12 @@ The variables we will be exploring to answer our research questions include:
 
 We will be showcasing the relationships within our data with heatmaps of the entire USA where different colors/patterns correlate to varying amounts of consumption of the types of energy. Some of our visualizations will use population data to create consumption per capita and others will not, to see if a trend emerges. 
 
-```{r}
-# Code goes here
-# Code to calculate summary statistics
-# Code for a visualization
+```{r prelim-data-analysis}
+
+  ggplot(data = final, aes(x = Consumption.Commercial.Petroleum_pc, color = State)) +
+  geom_histogram(bins = 20)
+  ggplot(data = final, aes(x = Expenditure.Commercial.Petroleum_pc, color = State)) +
+  geom_histogram(bins = 20)
+  ggplot(data = final, aes(x = Price.Commercial.Petroleum_pc, color = State)) +
+  geom_histogram(bins = 20)
 ```

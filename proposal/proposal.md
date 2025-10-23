@@ -308,7 +308,22 @@ visualizations will use population data to create consumption per capita
 and others will not, to see if a trend emerges.
 
 ``` r
-# Code goes here
-# Code to calculate summary statistics
-# Code for a visualization
+  ggplot(data = final, aes(x = Consumption.Commercial.Petroleum_pc, color = State)) +
+  geom_histogram(bins = 20)
 ```
+
+![](proposal_files/figure-gfm/prelim-data-analysis-1.png)<!-- -->
+
+``` r
+  ggplot(data = final, aes(x = Expenditure.Commercial.Petroleum_pc, color = State)) +
+  geom_histogram(bins = 20)
+```
+
+![](proposal_files/figure-gfm/prelim-data-analysis-2.png)<!-- -->
+
+``` r
+  ggplot(data = final, aes(x = Price.Commercial.Petroleum_pc, color = State)) +
+  geom_histogram(bins = 20)
+```
+
+![](proposal_files/figure-gfm/prelim-data-analysis-3.png)<!-- -->
