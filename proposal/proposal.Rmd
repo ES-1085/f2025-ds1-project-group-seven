@@ -1,6 +1,6 @@
 ---
 title: "Project proposal"
-author: "Team name"
+author: "Damian, Matty, Hank, and Daniel"
 output: github_document
 ---
 
@@ -16,15 +16,16 @@ library(readxl)
 Our data comes from a dataset showcasing various variables regarding energy for each US state from 1960-2019 from the U.S. Energy Information Administration. Our data is specifically the 2019 data for each state from that dataset. The variables for energy cover the consumption, expenditure, and price of a variety of different energy sources and industries for each state. 
 
 Research Question: 
-What are the overall trends that are shown in US energy consumption, expenditure, and price?
-Per capita consumption, regional price, regional consumption, etc.
+- What are the overall trends that are shown in US energy consumption, expenditure, and price?
+     (Per capita consumption, regional price, regional consumption, etc)
+- How does the population in each state correlate with their consumption and expenditure of each energy source?
 
 
 ## 2. Data
 
 Text goes here. Place your data in the /data folder, and add dimensions and codebook to the README in that folder. Then print out the output of glimpse() or skim() of your data frame.
 
-```{r}
+```{r per_capita}
 setwd("/cloud/project")
 
 energy <- read_csv("data/energy.csv")
@@ -64,12 +65,18 @@ glimpse(final)
 
 ## 3. Data analysis plan
 
-Text goes here.
-- What variables will you visualize to explore your research questions?
-- Will there be any other data that you need to find to help with your research question?
-- Very preliminary exploratory data analysis, including some summary statistics and visualizations, along with some explanation on how they help you learn more about your data. (You can add to these later as you work on your project.)
-- The data visualization(s) that you believe will be useful in exploring your question(s). (You can update these later as you work on your project.)
+The variables we will be exploring to answer our research questions include:
 
+- `State`: Identifies the state where the data is collected and reported
+- `Consumption.{industry}.{type}`: {type} consumed by the {industry} sector in billion BTU
+- `Expenditure.{industry}.{type}`: {type} expenditures in the {industry} sector in million dollars
+- `Price.{industry}.{type}`: {type} price in the {industry} sector in dollars per million BTU
+- `Population`: Population of each state
+- `Consumption.{industry}.{type}_pc`: {type} consumed by the {industry} sector in billion BTU per capita
+- `Expenditure.{industry}.{type}_pc`: {type} expenditures in the {industry} sector in million dollars per capita
+- `Price.{industry}.{type}_pc`: {type} price in the {industry} sector in dollars per million BTU per capita
+
+We will be showcasing the relationships within our data with heatmaps of the entire USA where different colors/patterns correlate to varying amounts of consumption of the types of energy. Some of our visualizations will use population data to create consumption per capita and others will not, to see if a trend emerges. 
 
 ```{r}
 # Code goes here
