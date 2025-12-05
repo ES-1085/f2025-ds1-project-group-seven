@@ -16,6 +16,10 @@ library(ggrepel)
 
 ## Data Clean Up Steps for Overall Data
 
+
+### Step 1: Data Cleaning
+We loaded, cleaned, and merged the energy and population datasets by state and included only the data from 2019. We then calculated per-capita values for all energy-related variables and added those new columns back into the main dataset. 
+
 ```{r general_data_cleaning}
 setwd("/cloud/project")
 
@@ -54,33 +58,12 @@ final <- joined %>%
 glimpse(final)
 ```
 
-## Plots
 
-### ggsave example for saving plots
-
-```{r starwars ggsave example}
-p1 <- starwars |>
-  filter(mass < 1000, 
-         species %in% c("Human", "Cerean", "Pau'an", "Droid", "Gungan")) |>
-  ggplot() +
-  geom_point(aes(x = mass, 
-                 y = height, 
-                 color = species)) +
-  labs(x = "Weight (kg)", 
-       y = "Height (m)",
-       color = "Species",
-       title = "Weight and Height of Select Starwars Species",
-       caption = paste("This data comes from the starwars api: https://swapi.py43.com"))
-
-
-ggsave("example-starwars.png", width = 4, height = 4)
-
-ggsave("example-starwars-wide.png", width = 6, height = 4)
-```
-
-
+### Step 2: Visualizations
 
 ### Plot 1: Commercial Petroleum Consumption Map
+
+For this first plot, we started by adding a lowercase state column to ensure that the data aligns with the mapping package’s format. This plot then showcases a U.S. map shaded by each state’s commercial petroleum consumption, using a gradient to highlight differences in energy use. The plot is able to show when commercial petroleum is consumed the most. 
 
 #### Data cleanup specific to plot 1
 
@@ -89,8 +72,7 @@ final <- final %>%
   mutate(state = State)
 ```
 
-
-#### Final Plot 1:
+#### Final Plot 1
 
 ```{r creat_map_petroleum, warning=FALSE}
 plot_usmap(
@@ -209,7 +191,7 @@ price_plot_data <- final %>%
 
 ```
 
-#### Final Plot 1:
+#### Final Plot 4:
 
 ```{r price_plot}
 
