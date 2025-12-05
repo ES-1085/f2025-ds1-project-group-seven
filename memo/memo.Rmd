@@ -15,7 +15,8 @@ library(usmap)
 
 ## Data Clean Up Steps for Overall Data
 
-### Step 1: _________
+### Step 1: Data Cleaning
+We loaded, cleaned, and merged the energy and population datasets by state and included only the data from 2019. We then calculated per-capita values for all energy-related variables and added those new columns back into the main dataset. 
 
 ```{r}
 setwd("/cloud/project")
