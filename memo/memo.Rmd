@@ -11,13 +11,12 @@ library(tidyverse)
 library(broom)
 library(readxl)
 library(usmap)
+library(ggrepel)
 ```
 
 ## Data Clean Up Steps for Overall Data
 
-### Step 1: _________
-
-```{r}
+```{r general_data_cleaning}
 setwd("/cloud/project")
 
 energy <- read_csv("data/energy.csv")
@@ -55,8 +54,6 @@ final <- joined %>%
 glimpse(final)
 ```
 
-### Step 2: ________
-
 ## Plots
 
 ### ggsave example for saving plots
@@ -83,33 +80,29 @@ ggsave("example-starwars-wide.png", width = 6, height = 4)
 
 
 
-### Plot 1: _________
+### Plot 1: Commercial Petroleum Consumption Map
 
-#### Data cleanup steps specific to plot 1
+#### Data cleanup specific to plot 1
 
-These data cleaning sections are optional and depend on if you have some data cleaning steps specific to a particular plot
-
-```{r}
-
+```{r adjust_state_label}
+final <- final %>%
+  mutate(state = State)
 ```
 
 
-#### Final Plot 1
+#### Final Plot 1:
 
 ```{r creat_map_petroleum, warning=FALSE}
-final <- final %>%
-  mutate(state = State)
-
 plot_usmap(
   linewidth = 0.1,
   color = "white",
   regions = "state",
   data = final,
-  values = 'Consumption.Commercial.Petroleum'
+  values = 'Consumption.Commercial.Petroleum_pc'
 ) +
   scale_fill_gradient(
     labels = scales::label_number(big.mark = ','),
-    high = 'brown',
+    high = 'steelblue',
     low = 'white'
   ) +
   labs(fill = 'Consumption (Billions BTU)',
@@ -124,11 +117,120 @@ plot_usmap(
 ```
 
 
-### Plot 2: _________
+### Plot 2: Commercial Petroleum Consumption Per Capita Map 
 
-### Plot 3: ___________
+```{r creat_map_petroleum_pc, warning=FALSE}
+plot_usmap(
+  linewidth = 0.1,
+  color = "white",
+  regions = "state",
+  data = final,
+  values = 'Expenditure.Commercial.Petroleum_pc'
+) +
+  scale_fill_gradient(
+    labels = scales::label_number(big.mark = ','),
+    high = 'steelblue',
+    low = 'white'
+  ) +
+  labs(fill = 'Consumption (Billions BTU)',
+       title = "Commercial Petroleum Consumption by State Across U.S.A.") +
+  guides(
+    fill = guide_colorbar(barwidth = unit(8, 'cm'))
+  ) +
+  theme(
+    legend.position = 'top',
+    plot.title = element_text(hjust = 0.5)  # <-- Center the title
+  )
+```
 
-Add more plot sections as needed. Each project should have at least 3 plots, but talk to me if you have fewer than 3.
+### Plot 3: Petroleum Expenditure Per Capita vs Petroleum Dependance
 
-### Plot 4: ___________ 
+#### Data cleanup specific to plot 3
+
+#Note: rowSums, grepl, contains, and ends_with are functions for creating aggreates of multiple variables based on naming conventions learned from ECON 368 with Professor Kyle Coombs.
+
+```{r create_expenditure_plot_data}
+
+expenditure_plot_data <- final %>%
+  mutate(
+    total_consumption_pc = rowSums(select(., ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_consumption_pc = rowSums(
+      select(., contains("Consumption") & contains("Petroleum") & ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_dependence = petroleum_consumption_pc / total_consumption_pc,
+    
+    petroleum_expenditure_pc = rowSums(
+      select(., contains("Expenditure") & contains("Petroleum") & ends_with("_pc")), na.rm = TRUE)
+  )
+
+```
+
+#### Final Plot 3:
+
+```{r expenditure_plot}
+
+expenditure_plot <- ggplot(expenditure_plot_data, aes(x = petroleum_dependence,
+                        y = petroleum_expenditure_pc,
+                        label = State)) +
+  geom_point(size = 3, alpha = 0.8, color = "steelblue") +   # steel blue
+  geom_smooth(method = "lm", color = "blue", linewidth = 1, se = TRUE) +
+  geom_text_repel(size = 3, color = "black") +
+  labs(
+    title = "Petroleum Expenditure per Capita vs. Petroleum Dependence",
+    x = "Proportion of Total State Consumption of Petroleum",
+    y = "Petroleum Expenditure per Capita (USD)"
+  ) +
+  theme_minimal(base_size = 11.5)
+
+expenditure_plot
+
+```
+
+
+### Plot 4: Petroleum Price vs. Petroleum Dependance
+
+#### Data cleanup specific to plot 3
+
+```{r create_price_plot_data}
+
+price_plot_data <- final %>%
+  mutate(
+    total_consumption_pc = rowSums(select(., ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_consumption_pc = rowSums(
+      select(., contains("Consumption") & contains("Petroleum") & ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_dependence = petroleum_consumption_pc / total_consumption_pc,
+    
+    petroleum_price = rowMeans(
+      select(., contains("Price") & contains("Petroleum")), na.rm = TRUE)
+  )
+
+```
+
+#### Final Plot 1:
+
+```{r price_plot}
+
+price_plot <- ggplot(price_plot_data, aes(x = petroleum_dependence,
+                        y = petroleum_price,
+                        label = State)) +
+  geom_point(size = 3, alpha = 0.8, color = "steelblue") +
+  geom_smooth(method = "lm", color = "blue", linewidth = 1, se = TRUE) +
+  geom_text_repel(size = 3, color = "black") +
+  labs(
+    x = "Proportion of Total State Consumption from Petroleum",
+    y = "Average Petroleum Price (USD per million BTU)"
+  ) +
+  theme_minimal(base_size = 11.5) +
+  theme(
+    axis.text = element_text(size = 10.5),
+    axis.title = element_text(size = 10.5)
+  )
+
+price_plot
+
+```
+
 
