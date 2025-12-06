@@ -14,11 +14,17 @@ library(tidyverse)
 library(broom)
 library(readxl)
 library(usmap)
+library(ggrepel)
 ```
 
 ## Data Clean Up Steps for Overall Data
 
-### Step 1: \_\_\_\_\_\_\_\_\_
+### Step 1: Data Cleaning
+
+We loaded, cleaned, and merged the energy and population datasets by
+state and included only the data from 2019. We then calculated
+per-capita values for all energy-related variables and added those new
+columns back into the main dataset.
 
 ``` r
 setwd("/cloud/project")
@@ -271,45 +277,26 @@ glimpse(final)
     ## $ Price.Transportation.Petroleum_pc                    <dbl> 2.809123e-05, 3.9…
     ## $ `Price.Transportation.Natural Gas_pc`                <dbl> 0.000000e+00, 1.8…
 
-### Step 2: \_\_\_\_\_\_\_\_
+### Step 2: Visualizations
 
-## Plots
+### Plot 1: Commercial Petroleum Consumption Map
 
-### ggsave example for saving plots
+For this first plot, we started by adding a lowercase state column to
+ensure that the data aligns with the mapping package’s format. This plot
+then showcases a U.S. map shaded by each state’s commercial petroleum
+consumption, using a gradient to highlight differences in energy use.
+The plot is able to show when commercial petroleum is consumed the most.
 
-``` r
-p1 <- starwars |>
-  filter(mass < 1000, 
-         species %in% c("Human", "Cerean", "Pau'an", "Droid", "Gungan")) |>
-  ggplot() +
-  geom_point(aes(x = mass, 
-                 y = height, 
-                 color = species)) +
-  labs(x = "Weight (kg)", 
-       y = "Height (m)",
-       color = "Species",
-       title = "Weight and Height of Select Starwars Species",
-       caption = paste("This data comes from the starwars api: https://swapi.py43.com"))
-
-
-ggsave("example-starwars.png", width = 4, height = 4)
-
-ggsave("example-starwars-wide.png", width = 6, height = 4)
-```
-
-### Plot 1: \_\_\_\_\_\_\_\_\_
-
-#### Data cleanup steps specific to plot 1
-
-These data cleaning sections are optional and depend on if you have some
-data cleaning steps specific to a particular plot
-
-#### Final Plot 1
+#### Data cleanup specific to plot 1
 
 ``` r
 final <- final %>%
   mutate(state = State)
+```
 
+#### Final Plot 1
+
+``` r
 plot_usmap(
   linewidth = 0.1,
   color = "white",
@@ -319,7 +306,7 @@ plot_usmap(
 ) +
   scale_fill_gradient(
     labels = scales::label_number(big.mark = ','),
-    high = 'brown',
+    high = 'steelblue',
     low = 'white'
   ) +
   labs(fill = 'Consumption (Billions BTU)',
@@ -333,13 +320,141 @@ plot_usmap(
   )
 ```
 
-![](memo_files/figure-gfm/creat_map_petroleum-1.png)<!-- -->
+<img src="memo_files/figure-gfm/creat_map_petroleum-1.png" alt="Map of the United States with blue gradient fill representing the Commercial Petroleum Consumption of each state. California and New York stand out as the largest consumers."  />
 
-### Plot 2: \_\_\_\_\_\_\_\_\_
+### Plot 2: Commercial Petroleum Consumption Per Capita Map
 
-### Plot 3: \_\_\_\_\_\_\_\_\_\_\_
+``` r
+plot_usmap(
+  linewidth = 0.1,
+  color = "white",
+  regions = "state",
+  data = final,
+  values = 'Expenditure.Commercial.Petroleum_pc'
+) +
+  scale_fill_gradient(
+    labels = scales::label_number(big.mark = ','),
+    high = 'steelblue',
+    low = 'white'
+  ) +
+  labs(fill = 'Consumption (Billions BTU)',
+       title = "Commercial Petroleum Consumption by State Across U.S.A.") +
+  guides(
+    fill = guide_colorbar(barwidth = unit(8, 'cm'))
+  ) +
+  theme(
+    legend.position = 'top',
+    plot.title = element_text(hjust = 0.5)  # <-- Center the title
+  )
+```
 
-Add more plot sections as needed. Each project should have at least 3
-plots, but talk to me if you have fewer than 3.
+<img src="memo_files/figure-gfm/creat_map_petroleum_pc-1.png" alt="Map of the United States with blue gradient fill representing the commercial petroleum consumption per capita of each state. Alaska, Maine, Vermont, and New Hampshire stand out as the largest consumers per capita."  />
 
-### Plot 4: \_\_\_\_\_\_\_\_\_\_\_
+### Plot 3: Petroleum Expenditure Per Capita vs Petroleum Dependance
+
+#### Data cleanup specific to plot 3
+
+\#Note: rowSums, grepl, contains, and ends_with are functions for
+creating aggreates of multiple variables based on naming conventions
+learned from ECON 368 with Professor Kyle Coombs.
+
+``` r
+expenditure_plot_data <- final %>%
+  mutate(
+    total_consumption_pc = rowSums(select(., ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_consumption_pc = rowSums(
+      select(., contains("Consumption") & contains("Petroleum") & ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_dependence = petroleum_consumption_pc / total_consumption_pc,
+    
+    petroleum_expenditure_pc = rowSums(
+      select(., contains("Expenditure") & contains("Petroleum") & ends_with("_pc")), na.rm = TRUE)
+  )
+```
+
+#### Final Plot 3:
+
+``` r
+expenditure_plot <- ggplot(expenditure_plot_data, aes(x = petroleum_dependence,
+                        y = petroleum_expenditure_pc,
+                        label = State)) +
+  geom_point(size = 3, alpha = 0.8, color = "steelblue") +   # steel blue
+  geom_smooth(method = "lm", color = "blue", linewidth = 1, se = TRUE) +
+  geom_text_repel(size = 3, color = "black") +
+  labs(
+    title = "Petroleum Expenditure per Capita vs. Petroleum Dependence",
+    x = "Proportion of Total State Consumption of Petroleum",
+    y = "Petroleum Expenditure per Capita (USD)"
+  ) +
+  theme_minimal(base_size = 11.5)
+
+expenditure_plot
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+    ## Warning: The following aesthetics were dropped during statistical transformation: label.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+
+    ## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+    ## increasing max.overlaps
+
+<img src="memo_files/figure-gfm/expenditure_plot-1.png" alt="Scatter plot with trend line displaying correlation between petroleum expenditure per capita and petroleum dependance. The slope of the trend line is slightly negative."  />
+
+### Plot 4: Petroleum Price vs. Petroleum Dependance
+
+#### Data cleanup specific to plot 3
+
+``` r
+price_plot_data <- final %>%
+  mutate(
+    total_consumption_pc = rowSums(select(., ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_consumption_pc = rowSums(
+      select(., contains("Consumption") & contains("Petroleum") & ends_with("_pc")), na.rm = TRUE),
+    
+    petroleum_dependence = petroleum_consumption_pc / total_consumption_pc,
+    
+    petroleum_price = rowMeans(
+      select(., contains("Price") & contains("Petroleum")), na.rm = TRUE)
+  )
+```
+
+#### Final Plot 4:
+
+``` r
+price_plot <- ggplot(price_plot_data, aes(x = petroleum_dependence,
+                        y = petroleum_price,
+                        label = State)) +
+  geom_point(size = 3, alpha = 0.8, color = "steelblue") +
+  geom_smooth(method = "lm", color = "blue", linewidth = 1, se = TRUE) +
+  geom_text_repel(size = 3, color = "black") +
+  labs(
+    x = "Proportion of Total State Consumption from Petroleum",
+    y = "Average Petroleum Price (USD per million BTU)"
+  ) +
+  theme_minimal(base_size = 11.5) +
+  theme(
+    axis.text = element_text(size = 10.5),
+    axis.title = element_text(size = 10.5)
+  )
+
+price_plot
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+    ## Warning: The following aesthetics were dropped during statistical transformation: label.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+
+    ## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+    ## increasing max.overlaps
+
+<img src="memo_files/figure-gfm/price_plot-1.png" alt="Scatter plot with trend line displaying correlation between petroleum price and petroleum dependance. The slope of the trend line is approximately 0 and is horizontal across the plot."  />

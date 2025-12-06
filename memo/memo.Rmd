@@ -74,13 +74,13 @@ final <- final %>%
 
 #### Final Plot 1
 
-```{r creat_map_petroleum, warning=FALSE}
+```{r creat_map_petroleum, warning=FALSE, fig.alt = "Map of the United States with blue gradient fill representing the Commercial Petroleum Consumption of each state. California and New York stand out as the largest consumers."}
 plot_usmap(
   linewidth = 0.1,
   color = "white",
   regions = "state",
   data = final,
-  values = 'Consumption.Commercial.Petroleum_pc'
+  values = 'Consumption.Commercial.Petroleum'
 ) +
   scale_fill_gradient(
     labels = scales::label_number(big.mark = ','),
@@ -101,7 +101,7 @@ plot_usmap(
 
 ### Plot 2: Commercial Petroleum Consumption Per Capita Map 
 
-```{r creat_map_petroleum_pc, warning=FALSE}
+```{r creat_map_petroleum_pc, warning=FALSE, fig.alt = "Map of the United States with blue gradient fill representing the commercial petroleum consumption per capita of each state. Alaska, Maine, Vermont, and New Hampshire stand out as the largest consumers per capita."}
 plot_usmap(
   linewidth = 0.1,
   color = "white",
@@ -150,7 +150,7 @@ expenditure_plot_data <- final %>%
 
 #### Final Plot 3:
 
-```{r expenditure_plot}
+```{r expenditure_plot, fig.alt = "Scatter plot with trend line displaying correlation between petroleum expenditure per capita and petroleum dependance. The slope of the trend line is slightly negative."}
 
 expenditure_plot <- ggplot(expenditure_plot_data, aes(x = petroleum_dependence,
                         y = petroleum_expenditure_pc,
@@ -193,7 +193,7 @@ price_plot_data <- final %>%
 
 #### Final Plot 4:
 
-```{r price_plot}
+```{r price_plot, fig.alt = "Scatter plot with trend line displaying correlation between petroleum price and petroleum dependance. The slope of the trend line is approximately 0 and is horizontal across the plot."}
 
 price_plot <- ggplot(price_plot_data, aes(x = petroleum_dependence,
                         y = petroleum_price,
