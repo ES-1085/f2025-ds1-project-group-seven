@@ -285,7 +285,6 @@ For this first plot, we started by adding a lowercase state column to
 ensure that the data aligns with the mapping package’s format. This plot
 then showcases a U.S. map shaded by each state’s commercial petroleum
 consumption, using a gradient to highlight differences in energy use.
-The plot is able to show when commercial petroleum is consumed the most.
 
 #### Data cleanup specific to plot 1
 
@@ -323,6 +322,11 @@ plot_usmap(
 <img src="memo_files/figure-gfm/creat_map_petroleum-1.png" alt="Map of the United States with blue gradient fill representing the Commercial Petroleum Consumption of each state. California and New York stand out as the largest consumers."  />
 
 ### Plot 2: Commercial Petroleum Consumption Per Capita Map
+
+This second plot is also a U.S. map but this time it is shaded by each
+state’s expenditure of commercial petroleum (how much they spend on the
+fuel itself as well as the associated processes), using a gradient to
+highlight the differences.
 
 ``` r
 plot_usmap(
@@ -375,6 +379,14 @@ expenditure_plot_data <- final %>%
 
 #### Final Plot 3:
 
+For this third plot, we created a scatterplot with each US state
+comparing Petroleum Expenditure Per Capita and Petroleum Dependence. On
+the X-axis, we have each state’s consumption of Petroleum shown as the
+proportion of their total energy consumption which showcases dependence.
+On the Y-axis, we have the Petroleum Expenditure Per Capita for each
+state which is how much each state spends on petroleum and the
+associated processes.
+
 ``` r
 expenditure_plot <- ggplot(expenditure_plot_data, aes(x = petroleum_dependence,
                         y = petroleum_expenditure_pc,
@@ -425,6 +437,12 @@ price_plot_data <- final %>%
 ```
 
 #### Final Plot 4:
+
+For our fourth and final plot, we created another scatterplot comparing
+Petroleum Dependence and Average Petroleum Price with the X-axis again
+being the proportion of each state’s consumption that Petroleum occupies
+and the Y-axis being the average price of Petroleum for consumers in
+each state.
 
 ``` r
 price_plot <- ggplot(price_plot_data, aes(x = petroleum_dependence,
